@@ -1,25 +1,4 @@
-const myLibrary = [
-    {
-        "author": "Chinua Achebe",
-        "country": "Nigeria",
-        "imageLink": "images/things-fall-apart.jpg",
-        "language": "English",
-        "link": "https://en.wikipedia.org/wiki/Things_Fall_Apart\n",
-        "pages": 209,
-        "title": "Things Fall Apart",
-        "year": 1958
-      },
-      {
-        "author": "Hans Christian Andersen",
-        "country": "Denmark",
-        "imageLink": "images/fairy-tales.jpg",
-        "language": "Danish",
-        "link": "https://en.wikipedia.org/wiki/Fairy_Tales_Told_for_Children._First_Collection.\n",
-        "pages": 784,
-        "title": "Fairy tales",
-        "year": 1836
-      }
-]
+const myLibrary = []
 
 //Query Selectors
 const openForm = document.querySelector("#open-form")
@@ -33,6 +12,10 @@ function Book(title, author, pages, perused) {
     this.author = author;
     this.pages = pages;
     this.perused = perused; //bool val
+}
+
+Book.prototype.changeReadStatus = function(e) {
+    return (this.perused) ? (this.perused = false) : (this.perused = true);
 }
 
 //Helper functions
@@ -51,16 +34,16 @@ const createBook = () => {
 
 const renderBooks = () => {
     let libraryCont = document.querySelector("#library-container")
-    const renderBookCards = (title, author, pages, read, index) => {
-        let buttonValue = (read) ? "Read" : "Have not read"
+    const renderBookCards = (title, author, pages, perused, index) => {
+        let buttonValue = (perused) ? "Have read" : "Have not read"
         libraryCont.innerHTML += `
             <div class=\"book-card\">
                 <p class=\"book-title\">${title}</p>
                 <p class=\"book-author\">${author}</p>
                 <p class=\"book-pages\">Pages: ${pages}</p>
                 <div class=\"book-btns\">
-                    <input class=\"read-book\" type=\"button\" value=\"${buttonValue}\">
-                    <input id=\"${index}\" class=\"remove-book\" type=\"button\" value=\"Remove Book\">
+                    <input class=\"read-book bk-btn\" type=\"button\" value=\"${buttonValue}\">
+                    <input id=\"${index}\" class=\"remove-book bk-btn\" type=\"button\" value=\"Remove Book\">
                 </div>
             </div>
             `
@@ -72,7 +55,7 @@ const renderBooks = () => {
         renderBookCards(myLibrary[i].title, 
             myLibrary[i].author, 
             myLibrary[i].pages, 
-            myLibrary[i].read, 
+            myLibrary[i].perused, 
             i)
     }
 
@@ -114,13 +97,17 @@ const addBookToLibrary = (event) => {
         document.querySelector("#book-pages").value = ""
         document.querySelector("#book-read").checked = false;
     }
-
+    hideForm()
 }
 
 const changeRead = (e) => {
     //need to identify which book it is in myLibrary
     //afterwards change perused to !perused
     //either change the input value, or re-render everything again
+    let bookID = e.target.nextElementSibling.id //remove button has ID containing location of book in myLibrary
+
+    e.target.value = (e.target.value === "Have read") ? ("Have not read") : ("Have read")
+    myLibrary[bookID].changeReadStatus()
 }
 
 const delBookFromLibrary = (e) => {
@@ -149,3 +136,4 @@ openForm.addEventListener('click', () => showForm())
 closeForm.addEventListener('click', () => hideForm())
 addBook.addEventListener('click', (event) => addBookToLibrary(event))
 
+renderBooks()
